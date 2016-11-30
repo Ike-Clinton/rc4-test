@@ -42,7 +42,7 @@ int main(void)
 		cipher2->encipher(plaintext);
 		ciphertext = Botan::hex_encode(plaintext);
 		cout << "The output of RC4(0xFACF5374, 0xAABBCCDD) is: " << ciphertext << endl;
-		
+			
 		string ctHex = Botan::hex_encode(plaintext);
 
 		cipher2->encipher(Botan::hex_decode(ciphertext));
