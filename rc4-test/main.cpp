@@ -21,37 +21,35 @@ int main(void)
 {
 	try
 	{
-		//Init cipher
-		std::string plaintext("hello");
-		std::vector<uint8_t> pt(plaintext.data(), plaintext.data() + plaintext.length());
-		const std::vector<uint8_t> key = Botan::hex_decode("736563726574");
+
 		std::unique_ptr<Botan::StreamCipher> cipher(Botan::StreamCipher::create("RC4"));
-
-		//set key and show algorithm used
-		cipher->set_key(key);
-		std::cout << std::endl << cipher->name() << std::endl;
-		// Perform encryption and print results
-		cipher->encipher(pt);
-		std::cout << Botan::hex_encode(pt) << endl;
-
-		cout << "\n";
-
 		std::unique_ptr<Botan::StreamCipher> cipher2(Botan::StreamCipher::create("RC4"));
-		cipher2->set_key(key);
-		std::cout << std::endl << cipher2->name() << std::endl;
 
-		string ctHex = Botan::hex_encode(pt);
-		string ciphertext = "";
+		cout << endl << cipher->name() << endl;
+
+		const std::vector<uint8_t> key = { 0x11, 0x22, 0x33, 0x44 };
+		cipher->set_key(key);
+		cipher2->set_key(key);
+
+		std::vector<uint8_t> plaintext = {0xAA, 0xBB, 0xCC, 0xDD};
+		
+		// Perform encryption and print results
+		cipher->encipher(plaintext);
+		string ciphertext = Botan::hex_encode(plaintext);
+		cout << "The output of RC4(0x11223344, 0xAABBCCDD) is: " << ciphertext << endl;
+
+		// Here we use a brand new cipher object to reset the IV/bit-stream
+		cipher2->encipher(plaintext);
+		ciphertext = Botan::hex_encode(plaintext);
+		cout << "The output of RC4(0xFACF5374, 0xAABBCCDD) is: " << ciphertext << endl;
+		
+		string ctHex = Botan::hex_encode(plaintext);
+
+		cipher2->encipher(Botan::hex_decode(ciphertext));
 
 		// Convet ctHex to ASCII
-		hex2ascii(ctHex, ciphertext);
-		cout << "Converted " << ctHex << " -> " << ciphertext << endl;
-
-		std::vector<uint8_t> ct(ciphertext.data(), ciphertext.data() + ciphertext.length());
-		cipher->encipher(ct);
-		std::cout << Botan::hex_encode(ct) << endl;
-
-
+		//hex2ascii(ctHex, ciphertext);
+		//cout << "Converted " << ctHex << " -> " << ciphertext << endl;
 	}
 	catch (std::exception& e)
 	{
